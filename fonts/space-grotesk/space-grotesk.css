@@ -1,0 +1,91 @@
+@supports (font-variation-settings: "wdth" 115) {
+  @font-face {
+    font-family: "Space Grotesk";
+    src: url("./SpaceGrotesk-VariableFont_wght.ttf") format("truetype");
+    font-weight: 300 700;
+    font-display: swap;
+    font-style: normal;
+  }
+}
+
+@supports not (font-variation-settings: "wdth" 115) {
+  @font-face {
+    font-family: "Space Grotesk";
+    src: url("./SpaceGrotesk-Light.ttf") format("truetype");
+    font-weight: 300;
+    font-display: swap;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: "Space Grotesk";
+    src: url("./SpaceGrotesk-LightItalic.ttf") format("truetype");
+    font-weight: 300;
+    font-display: swap;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: "Space Grotesk";
+    src: url("./SpaceGrotesk-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-display: swap;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: "Space Grotesk";
+    src: url("./SpaceGrotesk-Italic.ttf") format("truetype");
+    font-weight: 400;
+    font-display: swap;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: "Space Grotesk";
+    src: url("./SpaceGrotesk-Medium.ttf") format("truetype");
+    font-weight: 500;
+    font-display: swap;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: "Space Grotesk";
+    src: url("./SpaceGrotesk-MediumItalic.ttf") format("truetype");
+    font-weight: 500;
+    font-display: swap;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: "Space Grotesk";
+    src: url("./SpaceGrotesk-SemiBold.ttf") format("truetype");
+    font-weight: 600;
+    font-display: swap;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: "Space Grotesk";
+    src: url("./SpaceGrotesk-SemiBoldItalic.ttf") format("truetype");
+    font-weight: 600;
+    font-display: swap;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: "Space Grotesk";
+    src: url("./SpaceGrotesk-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-display: swap;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: "Space Grotesk";
+    src: url("./SpaceGrotesk-BoldItalic.ttf") format("truetype");
+    font-weight: 700;
+    font-display: swap;
+    font-style: italic;
+  }
+}
