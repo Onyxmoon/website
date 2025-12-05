@@ -1,4 +1,4 @@
-@import url("./fonts/space-grotesk/space-grotesk.css");
+@import url("../fonts/space-grotesk/space-grotesk.css");
 
 * {
   margin: 0;
@@ -87,11 +87,11 @@ a {
 }
 
 .js-enabled .typewriter .typewriter-text--hidden {
-  opacity: 0;
+  visibility: hidden;
 }
 
 .links {
-  margin-top: 3rem;
+  margin-top: 4rem;
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
