@@ -25,6 +25,8 @@ p.intro {
   font: 600 3rem/1.05 "Space Grotesk", sans-serif;
   max-width: 30em;
   margin-top: 6rem;
+  min-height: 3.15rem;
+  overflow-wrap: break-word;
 }
 
 h2 {
