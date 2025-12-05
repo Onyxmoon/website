@@ -17,6 +17,11 @@ body {
   min-height: 100vh;
 }
 
+main {
+  display: flex;
+  flex-direction: column;
+}
+
 h1 {
   font: 400 2rem/1 "Space Grotesk", sans-serif;
 }
@@ -27,6 +32,13 @@ p.intro {
   margin-top: 6rem;
   min-height: 3.15rem;
   overflow-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+  p.intro {
+    order: 2;
+    margin-top: 2rem;
+  }
 }
 
 h2 {
@@ -97,6 +109,14 @@ a {
   flex-wrap: wrap;
 }
 
+@media (max-width: 768px) {
+  .links {
+    order: 1;
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+  }
+}
+
 .links a {
   text-decoration: none;
   border-bottom: 1px solid currentColor;
@@ -119,6 +139,12 @@ a {
 .projects {
   margin-top: 6rem;
   max-width: 50em;
+}
+
+@media (max-width: 768px) {
+  .projects {
+    order: 3;
+  }
 }
 
 .projects h2 {
