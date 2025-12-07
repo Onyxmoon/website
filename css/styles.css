@@ -209,3 +209,105 @@ a {
 .project-link:hover {
   opacity: 0.7;
 }
+
+.about {
+  margin-top: 6rem;
+  max-width: 50em;
+}
+
+@media (max-width: 768px) {
+  .about {
+    order: 3;
+  }
+}
+
+.about h2 {
+  font: 700 2rem/1.2 "Space Grotesk", sans-serif;
+  margin-bottom: 1.5rem;
+}
+
+.about h3 {
+  font: 600 1.5rem/1.2 "Space Grotesk", sans-serif;
+  margin-bottom: 1rem;
+  margin-top: 3rem;
+}
+
+.about-content {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+  .about-content {
+    flex-direction: column;
+  }
+}
+
+.about-image {
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.about-image img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+  .about-image img {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+.about-text {
+  flex: 1;
+}
+
+.about-text p {
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.fun-facts ul,
+.friends-links ul {
+  margin-top: 1rem;
+  margin-left: 1.5rem;
+  line-height: 1.7;
+}
+
+.fun-facts li {
+  margin-bottom: 0.5rem;
+}
+
+.friends-links p {
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.friends-links li {
+  margin-bottom: 0.5rem;
+}
+
+.friends-links a {
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  transition: opacity 0.2s;
+}
+
+.friends-links a:hover {
+  opacity: 0.7;
+}
+
+.js-enabled .particle-image-source {
+  display: none;
+}
+
+.particle-canvas {
+  display: block;
+}
