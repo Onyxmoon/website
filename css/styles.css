@@ -249,19 +249,20 @@ a {
 .about-image {
   flex-shrink: 0;
   overflow: visible;
+    margin-left: 4rem;
 }
 
 .about-image img {
-  width: 200px;
-  height: 200px;
+  width: 300px;
+  height: 300px;
   object-fit: cover;
   border-radius: 50%;
 }
 
 @media (max-width: 768px) {
   .about-image img {
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
   }
 }
 
@@ -310,4 +311,17 @@ a {
 
 .particle-canvas {
   display: block;
+    width: 300px;
+    height: 300px;
+}
+
+@media (max-width: 768px) {
+  .particle-canvas {
+    width: 200px;
+    height: 200px;
+  }
+
+  .about-image {
+    margin-left: 0;
+  }
 }

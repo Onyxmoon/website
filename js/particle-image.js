@@ -1,7 +1,6 @@
 (function() {
   'use strict';
 
-  // Check for reduced motion preference
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (prefersReducedMotion) {
     return;
@@ -29,8 +28,12 @@
       this.canvas = null;
       this.ctx = null;
       this.particles = [];
-      this.mouse = { x: null, y: null, radius: options.mouseRadius || 100 };
+      this.mouse = { x: null, y: null, radius: options.mouseRadius || 80 };
       this.animationFrame = null;
+      this.clickPoint = { x: null, y: null, startTime: 0, active: false };
+      this.isColorized = false;
+      this.autoTimer = 1000;
+      this.loadTime = performance.now(); // Track when particles were created
 
       this.options = {
         particleGap: options.particleGap || 2,
@@ -38,7 +41,7 @@
         returnSpeed: options.returnSpeed || 0.08,
         mouseForce: options.mouseForce || 0.3,
         flowSpeed: options.flowSpeed || 0.032,
-        flowAmplitude: options.flowAmplitude || 12,
+        flowAmplitude: options.flowAmplitude || 8,
         damping: options.damping || 0.38,
         circular: options.circular !== false, // default true
         circularPadding: options.circularPadding || 10,
@@ -65,12 +68,9 @@
     }
 
     setup() {
-      // Set canvas size to match image
-      const rect = this.img.getBoundingClientRect();
+      // Set canvas internal resolution to match image
       this.canvas.width = this.img.naturalWidth;
       this.canvas.height = this.img.naturalHeight;
-      this.canvas.style.width = rect.width + 'px';
-      this.canvas.style.height = rect.height + 'px';
 
       // Insert canvas after image
       this.img.parentNode.insertBefore(this.canvas, this.img.nextSibling);
@@ -84,12 +84,10 @@
       // Add mouse event listeners
       this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
       this.canvas.addEventListener('mouseleave', () => this.handleMouseLeave());
+      this.canvas.addEventListener('click', (e) => this.handleClick(e));
 
       // Start animation
       this.animate();
-
-      // Handle window resize
-      window.addEventListener('resize', () => this.handleResize());
     }
 
     createParticles() {
@@ -115,8 +113,8 @@
           if (this.options.circular) {
             const dx = x - centerX;
             const dy = y - centerY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance > radius) {
+            const distanceSq = dx * dx + dy * dy;
+            if (distanceSq > radius * radius) {
               continue; // Skip particles outside the circle
             }
           }
@@ -133,8 +131,8 @@
               originY: y,
               vx: 0,
               vy: 0,
-              color: `rgba(${r}, ${g}, ${b}, ${alpha / 255})`,
-              grayColor: `rgba(${gray}, ${gray}, ${gray}, ${alpha / 255})`,
+              color: [r, g, b, alpha / 255],
+              grayColor: [gray, gray, gray, alpha / 255],
               size: this.options.particleSize,
               offset: Math.random() * Math.PI * 2,
               illuminated: 0
@@ -158,68 +156,118 @@
       this.mouse.y = null;
     }
 
-    handleResize() {
-      const rect = this.img.getBoundingClientRect();
-      this.canvas.style.width = rect.width + 'px';
-      this.canvas.style.height = rect.height + 'px';
-    }
+    handleClick(e) {
+      const rect = this.canvas.getBoundingClientRect();
+      const scaleX = this.canvas.width / rect.width;
+      const scaleY = this.canvas.height / rect.height;
 
-    interpolateColor(color1, color2, factor) {
-      // Extract rgba values from color strings
-      const rgba1 = color1.match(/[\d.]+/g).map(Number);
-      const rgba2 = color2.match(/[\d.]+/g).map(Number);
+      this.clickPoint.x = (e.clientX - rect.left) * scaleX;
+      this.clickPoint.y = (e.clientY - rect.top) * scaleY;
+      this.clickPoint.startTime = performance.now();
+      this.clickPoint.active = true;
 
-      const r = Math.round(rgba1[0] + (rgba2[0] - rgba1[0]) * factor);
-      const g = Math.round(rgba1[1] + (rgba2[1] - rgba1[1]) * factor);
-      const b = Math.round(rgba1[2] + (rgba2[2] - rgba1[2]) * factor);
-      const a = rgba1[3] + (rgba2[3] - rgba1[3]) * factor;
-
-      return `rgba(${r}, ${g}, ${b}, ${a})`;
+      // Toggle colorization state
+      this.isColorized = !this.isColorized;
     }
 
     animate() {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.time += this.options.flowSpeed;
 
+      // Auto-timer: trigger colorize wave after 5 seconds
+      const elapsed = performance.now() - this.loadTime;
+      if (elapsed >= this.autoTimer && !this.isColorized && !this.clickPoint.active) {
+        // Trigger automatic colorize wave from center
+        this.clickPoint.x = this.canvas.width / 2;
+        this.clickPoint.y = this.canvas.height / 2;
+        this.clickPoint.startTime = performance.now();
+        this.clickPoint.active = true;
+        this.isColorized = true;
+        this.autoTimer = Infinity; // Disable auto-timer after first trigger
+      }
+
+      // Create ImageData buffer for batch drawing
+      const imageData = this.ctx.createImageData(this.canvas.width, this.canvas.height);
+      const data = imageData.data;
+
       this.particles.forEach(particle => {
-        // Calculate distance from mouse
-        const mouseActive = this.mouse.x !== null && this.mouse.y !== null;
+        // Mouse interaction (disabled when colorized or during wave)
+        const mouseActive = this.mouse.x !== null && this.mouse.y !== null && !this.isColorized && !this.clickPoint.active;
         let distanceFromMouse = Infinity;
+        let distanceFromMouseSq = Infinity;
         let nearMouse = false;
 
         if (mouseActive) {
           const dx = this.mouse.x - particle.x;
           const dy = this.mouse.y - particle.y;
-          distanceFromMouse = Math.sqrt(dx * dx + dy * dy);
-          nearMouse = distanceFromMouse < this.mouse.radius;
+          distanceFromMouseSq = dx * dx + dy * dy;
+          nearMouse = distanceFromMouseSq < this.mouse.radius * this.mouse.radius;
 
           if (nearMouse) {
+            distanceFromMouse = Math.sqrt(distanceFromMouseSq);
             const force = (this.mouse.radius - distanceFromMouse) / this.mouse.radius;
             const angle = Math.atan2(dy, dx);
+            const easedForce = force * force;
 
-            // Softer wave-like repulsion with easing
-            const easedForce = force * force; // Square for softer falloff
             particle.vx -= Math.cos(angle) * easedForce * this.options.mouseForce;
             particle.vy -= Math.sin(angle) * easedForce * this.options.mouseForce;
-
-            // Illuminate particle based on proximity to mouse
             particle.illuminated = Math.max(particle.illuminated, force);
           }
         }
 
-        // Fade out illumination over time
-        particle.illuminated *= 0.92;
-
-        // Adjust behavior based on mouse proximity
-        // When mouse is active but particle is far from it, sharpen the image
+        // Click wave effect
         let effectiveReturnSpeed = this.options.returnSpeed;
         let effectiveFlowAmplitude = this.options.flowAmplitude;
 
+        if (this.clickPoint.active) {
+          const elapsed = performance.now() - this.clickPoint.startTime;
+          const waveRadius = (elapsed / 1000) * 150;
+          const dx = this.clickPoint.x - particle.x;
+          const dy = this.clickPoint.y - particle.y;
+          const distanceFromClickSq = dx * dx + dy * dy;
+          const waveRadiusSq = waveRadius * waveRadius;
+
+          if (distanceFromClickSq < waveRadiusSq) {
+            const distanceFromClick = Math.sqrt(distanceFromClickSq);
+            const progress = Math.min(1, (waveRadius - distanceFromClick) / 80);
+
+            // Apply color and sharpness changes
+            if (this.isColorized) {
+              particle.illuminated = Math.max(particle.illuminated, progress);
+              effectiveReturnSpeed *= (1 + progress * 5);
+              effectiveFlowAmplitude *= (1 - progress * 0.95);
+            } else {
+              particle.illuminated = Math.min(particle.illuminated, 1 - progress);
+              effectiveReturnSpeed = this.options.returnSpeed;
+              effectiveFlowAmplitude = this.options.flowAmplitude;
+            }
+          }
+
+          // Check if wave completed
+          const maxDistanceSq = this.canvas.width * this.canvas.width + this.canvas.height * this.canvas.height;
+          if ((waveRadius + 100) * (waveRadius + 100) > maxDistanceSq) {
+            this.clickPoint.active = false;
+          }
+        } else {
+          // Post-wave behavior
+          if (this.isColorized) {
+            particle.illuminated = Math.min(1, particle.illuminated + 0.05);
+            effectiveReturnSpeed *= 5;
+            effectiveFlowAmplitude *= 0.05;
+          } else {
+            particle.illuminated *= 0.92;
+          }
+        }
+
+        // Mouse proximity sharpening (only when not colorized)
         if (mouseActive) {
           const transitionRadius = this.mouse.radius * 1.8; // Extended radius for smooth transition
+          const transitionRadiusSq = transitionRadius * transitionRadius;
 
-          if (!nearMouse && distanceFromMouse < transitionRadius) {
+          if (!nearMouse && distanceFromMouseSq < transitionRadiusSq) {
             // Transition zone - smooth gradient from normal to sharpened
+            if (distanceFromMouse === Infinity) {
+              distanceFromMouse = Math.sqrt(distanceFromMouseSq);
+            }
             const transitionFactor = (distanceFromMouse - this.mouse.radius) / (transitionRadius - this.mouse.radius);
             const sharpenStrength = transitionFactor; // 0 at mouse.radius, 1 at transitionRadius
 
@@ -251,23 +299,49 @@
         particle.x += particle.vx;
         particle.y += particle.vy;
 
-        // Interpolate between gray and color based on illumination
-        const currentColor = particle.illuminated > 0.01
-          ? this.interpolateColor(particle.grayColor, particle.color, particle.illuminated)
-          : particle.grayColor;
+        // Calculate final color values
+        let r, g, b, a;
+        if (particle.illuminated > 0.01) {
+          const gray = particle.grayColor;
+          const color = particle.color;
+          const factor = particle.illuminated;
+          r = Math.round(gray[0] + (color[0] - gray[0]) * factor);
+          g = Math.round(gray[1] + (color[1] - gray[1]) * factor);
+          b = Math.round(gray[2] + (color[2] - gray[2]) * factor);
+          a = Math.round((gray[3] + (color[3] - gray[3]) * factor) * 255);
+        } else {
+          const gray = particle.grayColor;
+          r = gray[0];
+          g = gray[1];
+          b = gray[2];
+          a = Math.round(gray[3] * 255);
+        }
 
-        // Draw particle as circle
-        this.ctx.fillStyle = currentColor;
-        this.ctx.beginPath();
-        this.ctx.arc(
-          particle.x,
-          particle.y,
-          particle.size / 2,
-          0,
-          Math.PI * 2
-        );
-        this.ctx.fill();
+        // Draw particle to ImageData buffer (as small square for performance)
+        const px = Math.round(particle.x);
+        const py = Math.round(particle.y);
+        const size = Math.round(particle.size);
+
+        // Draw a filled square instead of circle for performance
+        for (let dy = 0; dy < size; dy++) {
+          for (let dx = 0; dx < size; dx++) {
+            const drawX = px + dx - Math.floor(size / 2);
+            const drawY = py + dy - Math.floor(size / 2);
+
+            // Bounds check
+            if (drawX >= 0 && drawX < this.canvas.width && drawY >= 0 && drawY < this.canvas.height) {
+              const index = (drawY * this.canvas.width + drawX) * 4;
+              data[index] = r;
+              data[index + 1] = g;
+              data[index + 2] = b;
+              data[index + 3] = a;
+            }
+          }
+        }
       });
+
+      // Draw the entire frame at once
+      this.ctx.putImageData(imageData, 0, 0);
 
       this.animationFrame = requestAnimationFrame(() => this.animate());
     }
