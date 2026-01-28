@@ -32,16 +32,32 @@
         </p>
         <p>
             Mail:
-            <SCRIPT LANGUAGE="JavaScript">user = 'mail';
-            site = 'philippborucki.me';
-            document.write('<a href=\"mailto:' + user + '@' + site + '\">');
-            document.write(user + '@' + site + '</a>');</SCRIPT>
+            <span id="mail-container"></span>
+
+            <script>
+                (function () {
+                    const user = "mail";
+                    const site = "philippborucki.me";
+                    const addr = `${user}@${site}`;
+
+                    const a = document.createElement("a");
+                    a.href = `mailto:${addr}`;
+                    a.textContent = addr;
+
+                    document.getElementById("mail-container").appendChild(a);
+                })();
+            </script>
+
             <br>
-            Matrix: <a href="https://matrix.to/#/@onyxmoon:matrix.onyxmoon.me" target="_blank" rel="noopener">@onyxmoon:matrix.onyxmoon.me</a>
+            Matrix:
+            <a href="https://matrix.to/#/@onyxmoon:matrix.onyxmoon.me" target="_blank" rel="noopener">
+                @onyxmoon:matrix.onyxmoon.me
+            </a>
         </p>
     </address>
 </footer>
 <script src="js/enabled.js"></script>
 <script src="js/simple-typewriter.js"></script>
+<script defer src="js/contact-mail.js"></script>
 </body>
 </html>
