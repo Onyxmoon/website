@@ -1,14 +1,38 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About – Philipp Borucki</title>
-    <link rel="stylesheet" href="css/styles.css?v=20251223" type="text/css">
+    <script>
+        // Applied before first paint so an explicit theme choice doesn't flash.
+        try {
+            const storedTheme = localStorage.getItem("theme")
+            if (storedTheme === "dark" || storedTheme === "light") {
+                document.documentElement.dataset.theme = storedTheme
+                document.documentElement.dataset.scheme = storedTheme
+            }
+        } catch (error) {
+        }
+    </script>
+    <link rel="stylesheet" href="css/styles.css?v=20260920" type="text/css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="canonical" href="https://philippborucki.me/about.html">
     <link rel="me" href="https://chaos.social/@onyxmoon">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)">
     <meta name="description"
           content="About Philipp Borucki – IT consultant from Flensburg, Germany."/>
+    <meta property="og:type" content="profile">
+    <meta property="og:site_name" content="Philipp Borucki">
+    <meta property="og:title" content="About – Philipp Borucki">
+    <meta property="og:url" content="https://philippborucki.me/about.html">
+    <meta property="og:description"
+          content="About Philipp Borucki – IT consultant from Flensburg, Germany."/>
+    <meta name="twitter:card" content="summary">
 </head>
 <body>
+<span id="theme-toggle" class="theme-slot"></span>
 <main>
     <h1><a href="/" class="home-link">Philipp Borucki</a></h1>
 
@@ -87,6 +111,7 @@
 </footer>
 <script src="js/enabled.js"></script>
 <script src="js/particle-image.js"></script>
+<script defer src="js/theme.js"></script>
 <script defer src="js/contact-mail.js"></script>
 </body>
 </html>

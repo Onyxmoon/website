@@ -4,6 +4,7 @@
   const TRIGGER_CLASS_NAME = "typewriter"
   const ACTIVE_CLASS_NAME = "typewriter--active"
   const KEEP_CURSOR_CLASS_NAME = "typewriter--keep-cursor"
+  const COMPLETE_CLASS_NAME = "typewriter-complete"
 
   const SPAN_SHOWN_CLASS_NAME = "typewriter-text--shown"
   const SPAN_HIDDEN_CLASS_NAME = "typewriter-text--hidden"
@@ -109,15 +110,26 @@
     }
   }
 
+  // Marks the body once every typewriter has finished, so other elements can
+  // wait for the intro to be typed out before they appear.
+  let pending = elements.length
+
+  const markComplete = () => {
+    if (--pending <= 0) document.body.classList.add(COMPLETE_CLASS_NAME)
+  }
+
+  if (elements.length === 0) document.body.classList.add(COMPLETE_CLASS_NAME)
+
   elements.forEach(element => {
     if (isElementScrolledBy(element)) {
       element.classList.add(ACTIVE_CLASS_NAME)
+      markComplete()
     } else if (isElementInView(element)) {
-      typewrite(element)
+      typewrite(element).then(markComplete)
     } else {
       const listener = () => {
         if (isElementInView(element)) {
-          typewrite(element)
+          typewrite(element).then(markComplete)
           window.removeEventListener("scroll", listener)
         }
       }

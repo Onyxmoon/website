@@ -1,16 +1,88 @@
 @import url("../fonts/space-grotesk/space-grotesk.css");
 
+:root {
+  color-scheme: light;
+  --bg: #ffffff;
+  --fg: #000000;
+  --muted: rgba(0, 0, 0, 0.6);
+  --line: rgba(0, 0, 0, 0.28);
+  --theme-fade:
+    color 0.3s ease,
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    fill 0.3s ease,
+    stroke 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e0e0e;
+    --fg: #f2f2f2;
+    --muted: rgba(242, 242, 242, 0.6);
+    --line: rgba(242, 242, 242, 0.32);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0e0e0e;
+  --fg: #f2f2f2;
+  --muted: rgba(242, 242, 242, 0.6);
+  --line: rgba(242, 242, 242, 0.32);
+}
+
+/*
+ * color-scheme is deliberately kept out of the blocks above. It cannot be
+ * animated, so it would switch instantly while the colours fade over 0.3s -
+ * the browser would re-render text for a dark background that is still light,
+ * which shows up as a flicker on the type. theme.js therefore sets data-scheme
+ * only after the fade has finished; on first paint it is set straight away.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-scheme="light"]) {
+    color-scheme: dark;
+  }
+}
+
+:root[data-scheme="light"] {
+  color-scheme: light;
+}
+
+:root[data-scheme="dark"] {
+  color-scheme: dark;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/*
+ * Fades every colour change instead of snapping - this covers the toggle as
+ * well as a change of the system setting. Deliberately no opacity here: the
+ * js-enabled starting states switch opacity, and fading those would make the
+ * finished elements flash on load.
+ */
+*,
+*::before,
+*::after {
+  transition: var(--theme-fade);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none;
+  }
+}
+
 body {
+  position: relative;
   font: 400 1rem/1.3 "Space Grotesk", serif;
-  color: black;
+  color: var(--fg);
   padding: 2.2rem 2rem 2rem;
-  background: white;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -24,6 +96,16 @@ main {
 
 h1 {
   font: 400 2rem/1 "Space Grotesk", sans-serif;
+  /* Keeps the title clear of the theme toggle. */
+  padding-right: 3rem;
+}
+
+/* Below this the title would wrap next to the toggle. */
+@media (max-width: 400px) {
+  h1 {
+    font-size: 1.6rem;
+    padding-right: 2.75rem;
+  }
 }
 
 p.intro {
@@ -48,7 +130,7 @@ h2 {
 }
 
 a {
-  color: black;
+  color: var(--fg);
 }
 
 .imprint {
@@ -83,7 +165,7 @@ a {
 .js-enabled .typewriter .typewriter-cursor::after {
   content: "|";
   position: absolute;
-  color: black;
+  color: var(--fg);
   animation: cursor-blink 1s steps(2) infinite;
 }
 
@@ -121,7 +203,7 @@ a {
 .links a {
   text-decoration: none;
   border-bottom: 1px solid currentColor;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s ease, var(--theme-fade);
 }
 
 .links a:hover {
@@ -134,7 +216,7 @@ a {
 }
 
 .home-link {
-  color: black;
+  color: var(--fg);
   text-decoration: none;
 }
 
@@ -173,7 +255,7 @@ a {
 .projects-outro {
   font: 400 1rem/1.4 "Space Grotesk", sans-serif;
   margin-top: 2rem;
-  opacity: 0.7;
+  color: var(--muted);
   max-width: 40em;
 }
 
@@ -188,7 +270,7 @@ a {
 
 .project-meta {
   font: 400 0.95rem/1.3 "Space Grotesk", sans-serif;
-  opacity: 0.6;
+  color: var(--muted);
   margin-bottom: 1rem;
 }
 
@@ -207,9 +289,9 @@ a {
   display: inline-block;
   text-decoration: none;
   border-bottom: 1px solid currentColor;
-  transition: opacity 0.2s;
   margin-top: 0.5rem;
   margin-right: 1.5rem;
+  transition: opacity 0.2s ease, var(--theme-fade);
 }
 
 .project-link:hover {
@@ -294,7 +376,7 @@ a {
 
 .friends-links p {
   margin-bottom: 1rem;
-  opacity: 0.7;
+  color: var(--muted);
 }
 
 .friends-links li {
@@ -304,7 +386,7 @@ a {
 .friends-links a {
   text-decoration: none;
   border-bottom: 1px solid currentColor;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s ease, var(--theme-fade);
 }
 
 .friends-links a:hover {
@@ -330,4 +412,508 @@ a {
   .about-image {
     margin-left: 0;
   }
+}
+
+/* --- Theme toggle ------------------------------------------------------- */
+
+/* Sits clear of the navigation, level with the top of the page title. */
+.theme-slot {
+  position: absolute;
+  top: 2.2rem;
+  right: 2rem;
+  line-height: 0;
+}
+
+.theme-toggle {
+  position: relative;
+  display: block;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  color: var(--fg);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: opacity 0.2s ease, var(--theme-fade);
+}
+
+.theme-toggle:hover {
+  opacity: 0.6;
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+/* All three icons are stacked; only the active one is shown. */
+.theme-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transform: rotate(-70deg) scale(0.4);
+  transition:
+    opacity 0.3s ease,
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.2),
+    stroke 0.3s ease;
+}
+
+.theme-toggle[data-mode="system"] .theme-icon--system,
+.theme-toggle[data-mode="light"] .theme-icon--light,
+.theme-toggle[data-mode="dark"] .theme-icon--dark {
+  opacity: 1;
+  transform: rotate(0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-icon {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* --- Mark (framed status with registration mark) ------------------------- */
+
+/*
+ * Without JavaScript the mark is simply there. With it, the mark waits for the
+ * typewriter intro to finish (body.typewriter-complete, set by
+ * simple-typewriter.js) and then plays once: the frame draws itself, the text
+ * fades in, and a printer's registration mark assembles as its cyan/magenta/
+ * yellow separations converge into the black mark.
+ */
+.mark {
+  /* The title's own height - the registration mark matches it so that it
+     centres on "DevOps @ HEIDELBERG" rather than on the whole box. */
+  --mark-title-size: 1.35rem;
+  --mark-title-height: calc(var(--mark-title-size) * 1.2 * 2);
+  --mark-padding-x: 1.4rem;
+  /* Space above the rule; below it sits a little tighter. */
+  --mark-gap: 1.35rem;
+
+  position: relative;
+  /* Keeps the box at its content width inside the flex column. */
+  align-self: flex-start;
+  /* No padding at the bottom - the pipeline footer brings its own. */
+  padding: 1.1rem var(--mark-padding-x) 0;
+  margin-top: 5rem;
+}
+
+.mark-row {
+  display: flex;
+  /* Bottom-aligned: with the mark as tall as the title, both share a centre. */
+  align-items: flex-end;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .mark {
+    order: 3;
+    margin-top: 3rem;
+  }
+}
+
+.mark-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* The path sits on the viewBox edge, so half the stroke would be clipped
+     away and the frame would render at half its width. */
+  overflow: visible;
+}
+
+.mark-frame path {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  /*
+   * The path carries pathLength="100", which normalises its length for dash
+   * maths. Without it the dash values would have to match the *rendered*
+   * perimeter in pixels (non-scaling-stroke measures there, not in viewBox
+   * units) and would break whenever the box changes size.
+   */
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+}
+
+.mark-label {
+  font: 400 0.72rem "Space Grotesk", sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.mark-title {
+  font: 600 var(--mark-title-size)/1.2 "Space Grotesk", sans-serif;
+  white-space: nowrap;
+}
+
+.mark-title a {
+  text-decoration: none;
+  border-bottom: 2px solid currentColor;
+  transition: opacity 0.2s ease, var(--theme-fade);
+}
+
+.mark-title a:hover {
+  opacity: 0.7;
+}
+
+.mark-reg {
+  flex: none;
+  width: var(--mark-title-height);
+  height: var(--mark-title-height);
+}
+
+.mark-reg g {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.mark-reg circle,
+.mark-reg line {
+  fill: none;
+  /* non-scaling-stroke so this is 2.5 real pixels, not 2 viewBox units. */
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.mark-reg-k {
+  stroke: var(--fg);
+}
+
+.mark-reg-c {
+  stroke: #00a0c6;
+  opacity: 0;
+}
+
+.mark-reg-m {
+  stroke: #d6006e;
+  opacity: 0;
+}
+
+.mark-reg-y {
+  stroke: #f5c400;
+  opacity: 0;
+}
+
+/* Hidden starting state - only once JavaScript can play the sequence. */
+.js-enabled .mark-frame path {
+  stroke-dashoffset: 100;
+}
+
+.js-enabled .mark-body,
+.js-enabled .mark-reg-k {
+  opacity: 0;
+}
+
+/* The typewriter has finished: play the sequence. */
+.typewriter-complete .mark-frame path {
+  animation: mark-draw 1.4s ease-out both;
+}
+
+.typewriter-complete .mark-body {
+  animation: mark-fade 0.7s ease 1s both;
+}
+
+.typewriter-complete .mark-reg-k {
+  animation: mark-reg-k 1.4s ease-out 1.7s both;
+}
+
+.typewriter-complete .mark-reg-c {
+  animation: mark-reg-c 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.7s both;
+}
+
+.typewriter-complete .mark-reg-m {
+  animation: mark-reg-m 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.7s both;
+}
+
+.typewriter-complete .mark-reg-y {
+  animation: mark-reg-y 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.7s both;
+}
+
+@keyframes mark-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes mark-fade {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes mark-reg-k {
+  0%, 55% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes mark-reg-c {
+  0% {
+    transform: translate(-10px, -7px);
+    opacity: 0;
+  }
+  25%, 75% {
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 0;
+  }
+}
+
+@keyframes mark-reg-m {
+  0% {
+    transform: translate(9px, -8px);
+    opacity: 0;
+  }
+  25%, 75% {
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 0;
+  }
+}
+
+@keyframes mark-reg-y {
+  0% {
+    transform: translate(2px, 11px);
+    opacity: 0;
+  }
+  25%, 75% {
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 0;
+  }
+}
+
+/* Reduced motion: show the finished mark right away, no waiting, no colour. */
+@media (prefers-reduced-motion: reduce) {
+  .js-enabled .mark-frame path {
+    stroke-dashoffset: 0;
+  }
+
+  .js-enabled .mark-body,
+  .js-enabled .mark-reg-k {
+    opacity: 1;
+  }
+
+  .typewriter-complete .mark-frame path,
+  .typewriter-complete .mark-body,
+  .typewriter-complete .mark-reg-k,
+  .typewriter-complete .mark-reg-c,
+  .typewriter-complete .mark-reg-m,
+  .typewriter-complete .mark-reg-y {
+    animation: none;
+  }
+}
+
+/* --- Pipeline ------------------------------------------------------------ */
+
+/* A footer inside the frame: pulled out to the full width, ruled off above. */
+.pipe {
+  position: relative;
+  margin: var(--mark-gap) calc(var(--mark-padding-x) * -1) 0;
+  padding: 1.2rem var(--mark-padding-x) 1rem;
+}
+
+/* The rule is its own element so it can appear before the track does. */
+.pipe::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Same weight as the frame, but in the muted tone. */
+  height: 1.5px;
+  background: var(--line);
+  transform-origin: left center;
+}
+
+.pipe-track {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pipe-node {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--fg);
+  border-radius: 50%;
+}
+
+.pipe-line {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 1.5px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+/* A pulse travelling from one stage to the next. */
+.pipe-line::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  background: var(--fg);
+  animation: pipe-run 2.4s linear infinite;
+}
+
+.pipe-line:nth-of-type(2)::after {
+  animation-delay: 0.5s;
+}
+
+.pipe-line:nth-of-type(3)::after {
+  animation-delay: 1s;
+}
+
+@keyframes pipe-run {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+/* Each word sits under its node: the outer two flush with the track's ends. */
+.pipe-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.45rem;
+  font: 400 0.72rem "Space Grotesk", sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/*
+ * The rule is drawn early, while the box is still filling; the track waits
+ * until the registration mark has finished assembling.
+ */
+.js-enabled .pipe::before {
+  transform: scaleX(0);
+}
+
+.js-enabled .pipe-track,
+.js-enabled .pipe-labels {
+  opacity: 0;
+}
+
+.typewriter-complete .pipe::before {
+  animation: pipe-rule 0.65s ease-out 1.2s both;
+}
+
+.typewriter-complete .pipe-track,
+.typewriter-complete .pipe-labels {
+  animation: mark-fade 0.7s ease 2.6s both;
+}
+
+@keyframes pipe-rule {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pipe-line::after {
+    animation: none;
+  }
+
+  .js-enabled .pipe::before {
+    transform: none;
+  }
+
+  .js-enabled .pipe-track,
+  .js-enabled .pipe-labels {
+    opacity: 1;
+  }
+
+  .typewriter-complete .pipe::before,
+  .typewriter-complete .pipe-track,
+  .typewriter-complete .pipe-labels {
+    animation: none;
+  }
+}
+
+/* --- Project filter ----------------------------------------------------- */
+
+.project-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.project-filter button {
+  font: inherit;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity 0.2s ease, var(--theme-fade);
+}
+
+.project-filter button:hover {
+  opacity: 0.7;
+}
+
+.project-filter button[aria-pressed="true"] {
+  color: var(--fg);
+  font-weight: 600;
+  border-bottom-color: currentColor;
+}
+
+.project-filter-empty {
+  color: var(--muted);
+  margin-bottom: 3rem;
+}
+
+/* --- Not found ---------------------------------------------------------- */
+
+.notfound {
+  margin-top: 6rem;
+  max-width: 40em;
+}
+
+@media (max-width: 768px) {
+  .notfound {
+    order: 3;
+  }
+}
+
+.notfound h2 {
+  font: 700 2rem/1.2 "Space Grotesk", sans-serif;
+}
+
+.notfound p {
+  margin-bottom: 1rem;
+  line-height: 1.5;
 }

@@ -1,14 +1,38 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Selected Projects – Philipp Borucki</title>
-    <link rel="stylesheet" href="css/styles.css?v=20251223" type="text/css">
+    <script>
+        // Applied before first paint so an explicit theme choice doesn't flash.
+        try {
+            const storedTheme = localStorage.getItem("theme")
+            if (storedTheme === "dark" || storedTheme === "light") {
+                document.documentElement.dataset.theme = storedTheme
+                document.documentElement.dataset.scheme = storedTheme
+            }
+        } catch (error) {
+        }
+    </script>
+    <link rel="stylesheet" href="css/styles.css?v=20260920" type="text/css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="canonical" href="https://philippborucki.me/projects.html">
     <link rel="me" href="https://chaos.social/@onyxmoon">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)">
     <meta name="description"
           content="Selected projects by Philipp Borucki – DevOps, cloud engineering, and software development work."/>
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Philipp Borucki">
+    <meta property="og:title" content="Selected Projects – Philipp Borucki">
+    <meta property="og:url" content="https://philippborucki.me/projects.html">
+    <meta property="og:description"
+          content="Selected projects by Philipp Borucki – DevOps, cloud engineering, and software development work."/>
+    <meta name="twitter:card" content="summary">
 </head>
 <body>
+<span id="theme-toggle" class="theme-slot"></span>
 <main>
     <h1><a href="/" class="home-link">Philipp Borucki</a></h1>
 
@@ -35,7 +59,9 @@
             since it's the most widely used platform. Network and hardware projects are also difficult to showcase here.
         </p>
 
-        <article class="project">
+        <div id="project-filter"></div>
+
+        <article class="project" data-tags="Java, Games">
             <h3>ModSync</h3>
             <p class="project-meta">Mod Project, 2026 · Java</p>
             <p>Server-side mod management for Hytale dedicated servers with install, update, and removal commands from
@@ -47,7 +73,7 @@
                class="project-link">View on CurseForge →</a>
         </article>
 
-        <article class="project">
+        <article class="project" data-tags="Go, Desktop">
             <h3>GoMusic</h3>
             <p class="project-meta">Current Experiment, 2025/2026 · Go, Svelte, TypeScript</p>
             <p>Early-stage desktop music player prototype exploring local music library management and playback. An
@@ -59,7 +85,7 @@
                class="project-link">View on GitHub →</a>
         </article>
 
-        <article class="project">
+        <article class="project" data-tags="Go, Infrastructure, Academic">
             <h3>git-classrooms</h3>
             <p class="project-meta">Master Project, 2024 · Go, TypeScript</p>
             <p>A platform for automated classroom management with complete CI/CD pipeline integration. Enables automated
@@ -72,7 +98,7 @@
                class="project-link">Read more →</a>
         </article>
 
-        <article class="project">
+        <article class="project" data-tags="Elixir, Web, Academic">
             <h3>fire-bubble-chat</h3>
             <p class="project-meta">Personal and University Project, 2024 · Elixir</p>
             <p>Real-time chat application exploring functional programming patterns and Phoenix framework capabilities.
@@ -84,7 +110,7 @@
                 website (resets weekly) →</a>
         </article>
 
-        <article class="project">
+        <article class="project" data-tags="Go, Infrastructure, Academic">
             <h3>Cloud Engineering Coursework</h3>
             <p class="project-meta">Academic Project, 2024 · Go</p>
             <p>Practical implementations and experiments with cloud architectures, microservices, and modern
@@ -95,7 +121,7 @@
                class="project-link">View on GitHub →</a>
         </article>
 
-        <article class="project">
+        <article class="project" data-tags="Python, Academic">
             <h3>Deep Learning Kaggle Challenge</h3>
             <p class="project-meta">Academic Project, 2024 · Python</p>
             <p>Participation in Kaggle competition applying deep learning techniques to real-world dataset. Focused on
@@ -107,7 +133,7 @@
                target="_blank" rel="noopener" class="project-link">View on Kaggle →</a>
         </article>
 
-        <article class="project">
+        <article class="project" data-tags="Unity, Academic">
             <h3>Camera-based VR Interaction</h3>
             <p class="project-meta">Bachelor Thesis, 2023 · Unity, C#</p>
             <p>Development of 2D camera interaction system using StereoLabs ZED camera for Unity game engine. Created
@@ -120,7 +146,7 @@
                target="_blank" rel="noopener" class="project-link">Read more (German) →</a>
         </article>
 
-        <article class="project">
+        <article class="project" data-tags="Design">
             <h3>WAVES Barcamp</h3>
             <p class="project-meta">Design & Conception, 2021/2022</p>
             <p>Brand identity and corporate design for MEDIENSCOUTS SH Barcamp. Complete brand development from analysis
@@ -137,7 +163,7 @@
                 presentation (German) →</a>
         </article>
 
-        <article class="project">
+        <article class="project" data-tags="Unity, Games">
             <h3>untitled-ball-game</h3>
             <p class="project-meta">Game Project, 2023 · C#, Unity</p>
             <p>Experimental game prototype exploring physics-based mechanics and interactive gameplay. Focus on rapid
@@ -147,7 +173,7 @@
                class="project-link">View on GitHub →</a>
         </article>
 
-        <article class="project">
+        <article class="project" data-tags="Unity, Games">
             <h3>prototyping-games</h3>
             <p class="project-meta">Game Development, 2023 · Unity</p>
             <p>Collection of game prototypes and experimental mechanics. Rapid iteration and exploration of different
@@ -157,7 +183,7 @@
                 on GitHub →</a>
         </article>
 
-        <article class="project">
+        <article class="project" data-tags="PHP, Web, Infrastructure">
             <h3>Print Management System</h3>
             <p class="project-meta">University Project, 2021–present · PHP, JavaScript</p>
             <p>Full-stack web application for managing print production workflows at university print facility.
@@ -168,7 +194,7 @@
             <a href="https://a-110.de" target="_blank" rel="noopener" class="project-link">Visit website →</a>
         </article>
 
-        <article class="project">
+        <article class="project" data-tags="PHP, Web">
             <h3>Institute Management Platform</h3>
             <p class="project-meta">Professional Project, 2018–2023 · PHP, Symfony</p>
             <p>Web application for managing participants and administrative workflows at the Center for Cooperation in
@@ -179,7 +205,7 @@
                 website →</a>
         </article>
 
-        <article class="project">
+        <article class="project" data-tags="Web, Design">
             <h3>philippborucki.me</h3>
             <p class="project-meta">Personal Website, 2024 · JavaScript</p>
             <p>This minimalist portfolio website with custom typewriter effect implementation and accessibility
@@ -212,6 +238,9 @@
         </p>
     </address>
 </footer>
+<script src="js/enabled.js"></script>
+<script defer src="js/project-filter.js"></script>
+<script defer src="js/theme.js"></script>
 <script defer src="js/contact-mail.js"></script>
 </body>
 </html>
