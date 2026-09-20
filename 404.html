@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Not found – Philipp Borucki</title>
+    <script>
+        // Applied before first paint so an explicit theme choice doesn't flash.
+        try {
+            const storedTheme = localStorage.getItem("theme")
+            if (storedTheme === "dark" || storedTheme === "light") {
+                document.documentElement.dataset.theme = storedTheme
+                document.documentElement.dataset.scheme = storedTheme
+            }
+        } catch (error) {
+        }
+    </script>
+    <link rel="stylesheet" href="/css/styles.css?v=20260920" type="text/css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="me" href="https://chaos.social/@onyxmoon">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)">
+    <meta name="robots" content="noindex">
+    <meta name="description" content="This page doesn't exist."/>
+</head>
+<body>
+<span id="theme-toggle" class="theme-slot"></span>
+<main>
+    <h1><a href="/" class="home-link">Philipp Borucki</a></h1>
+
+    <nav class="links">
+        <a href="https://www.linkedin.com/in/philippborucki/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/Onyxmoon" target="_blank" rel="noopener">GitHub</a>
+        <a href="/about.html">About</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/files/cv.pdf" target="_blank">CV (German)</a>
+    </nav>
+
+    <section class="notfound">
+        <h2>404</h2>
+        <p>This page doesn't exist – or doesn't exist anymore.</p>
+        <p>Most things live on the <a href="/">start page</a> or under <a href="/projects.html">projects</a>.</p>
+    </section>
+</main>
+<footer class="imprint">
+    <h2>Imprint</h2>
+    <address>
+        <p>
+            Philipp Borucki<br>
+            Dorotheenstraße 15<br>
+            24939 Flensburg<br>
+            Germany
+        </p>
+        <p>
+            <span id="contact-mail"></span><br>
+            Matrix:
+            <a href="https://matrix.to/#/@onyxmoon:matrix.onyxmoon.me" target="_blank" rel="noopener">
+                @onyxmoon:matrix.onyxmoon.me
+            </a>
+        </p>
+    </address>
+</footer>
+<script src="/js/enabled.js"></script>
+<script defer src="/js/theme.js"></script>
+<script defer src="/js/contact-mail.js"></script>
+</body>
+</html>
